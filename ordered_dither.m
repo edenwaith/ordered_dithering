@@ -76,6 +76,14 @@ int magic_square4x4_alt[4][4] = {
 	{ 12, 10,  5,  3 }
 };
 
+int magic_square5x5[5][5] = {
+	{ 17,	24,	1,	8,	15 },
+	{ 23,	5,	7,	14,	16 },
+	{ 4,	6,	13,	20,	22 },
+	{ 10,	12,	19,	21,	3 },
+	{ 11,	18,	25,	2,	9 }
+};
+
 int shidoku_matrix4x4[4][4] = {
 	{ 1, 2, 3, 4 },
 	{ 3, 4, 1, 2 },
@@ -615,9 +623,11 @@ CGFloat ditherValue(DitherType ditherType, int ditherLevel, int col, int row) {
 		case MAGIC:
 			if (ditherLevel == 3) {
 				return magic_square3x3[col][row] / 9.0;
-			} else {
+			} else if (ditherLevel == 4) {
 				return magic_square4x4_alt[col][row] / 15.0;
 				// return magic_square4x4[col][row] / 16.0;
+			} else {
+				return magic_square5x5[col][row] / 25.0;
 			}
 			break;
 		case SHIDOKU:
