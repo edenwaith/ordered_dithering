@@ -503,6 +503,7 @@ int main(int argc, char *argv[])
 			ditherType = MAGIC;
 		} else if ([ditherArg isEqualToString: @"shidoku"] == YES) {
 			ditherType = SHIDOKU;
+			ditherLevel = 4; // Shidoku is always 4x4
 		} else if ([ditherArg isEqualToString: @"void"] == YES) {
 			ditherType = VOID;
 		}
@@ -598,7 +599,7 @@ int main(int argc, char *argv[])
 
 	// Save NSBitmapImageRep to an image and save to disk
 	NSString *fileName = [inputFile stringByDeletingPathExtension];
-	NSString *oneBitDitheredImagePath = [NSString stringWithFormat:@"%@_dithered_%dx%d.png", fileName, modVal, modVal];
+	NSString *oneBitDitheredImagePath = [NSString stringWithFormat:@"%@_%@_dithered_%dx%d.png", fileName, ditherArg, modVal, modVal];
 	NSBitmapImageRep *imgRep = [[oneBitDitheredImage representations] objectAtIndex: 0];
 	NSData *data = [imgRep representationUsingType: NSPNGFileType properties: nil];
 	[data writeToFile: oneBitDitheredImagePath atomically: NO];
