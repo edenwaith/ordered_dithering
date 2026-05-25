@@ -33,6 +33,9 @@ The granddaddy of ordered dithering matrices, based on the paper [An optimum met
 **32x32**  
 ![Geneva Lake with a 32x32 Bayer dither](Geneva_Lake_bayer_dithered_32x32.png)
 
+**64x64**  
+![Geneva Lake with a 64x64 Bayer dither](Geneva_Lake_bayer_dithered_64x64.png)
+
 
 ## Forced Field (Forced Random Dithering)
 
@@ -68,6 +71,9 @@ A portmanteau of "shi" (the Japanese word for "four") and "sudoku", which create
 ## Void-and-Cluster
 
 Method based on Robert Ulichney's paper [The void-and-cluster method for dither array generation](http://cv.ulichney.com/papers/1993-void-cluster.pdf) (1993).
+
+**4x4**  
+![Geneva Lake with a 4x4 Void-and-Cluster dither](Geneva_Lake_void_dithered_4x4.png)
 
 **8x8**  
 ![Geneva Lake with a 8x8 Void-and-Cluster dither](Geneva_Lake_void_dithered_8x8.png)
