@@ -604,8 +604,8 @@ int main(int argc, char *argv[])
 	NSData *data = [imgRep representationUsingType: NSPNGFileType properties: nil];
 	[data writeToFile: oneBitDitheredImagePath atomically: NO];
 
-	// [pool release];
 	}
+
 	return 0;
 }
 
@@ -626,8 +626,7 @@ CGFloat ditherValue(DitherType ditherType, int ditherLevel, int col, int row) {
 				return magic_square3x3[col][row] / 9.0;
 			} else if (ditherLevel == 4) {
 				return magic_square4x4_alt[col][row] / 15.0;
-				// return magic_square4x4[col][row] / 16.0;
-			} else {
+			} else { // 5x5
 				return magic_square5x5[col][row] / 25.0;
 			}
 			break;
@@ -641,7 +640,7 @@ CGFloat ditherValue(DitherType ditherType, int ditherLevel, int col, int row) {
 				return void_cluster16x16[col][row] / 255.0;
 			} else if (ditherLevel == 32) {
 				return void_cluster32x32[col][row] / 1023.0;
-			} else {
+			} else { // 64x64
 				return void_cluster64x64[col][row] / 4095.0; 
 				}
 			break;
