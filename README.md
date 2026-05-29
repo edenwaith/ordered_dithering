@@ -36,6 +36,15 @@ The granddaddy of ordered dithering matrices, based on the paper [An optimum met
 **64x64**  
 ![Geneva Lake with a 64x64 Bayer dither](Geneva_Lake_bayer_dithered_64x64.png)
 
+## Clustered Dot
+
+Reproduces halftoning technique used by newspapers.
+
+**4x4**  
+![Geneva Lake with a 4x4 Clustered Dot dither](Geneva_Lake_dot_dithered_4x4.png)
+
+**8x8**  
+![Geneva Lake with a 8x8 Clustered Dot dither](Geneva_Lake_dot_dithered_8x8.png)
 
 ## Forced Field (Forced Random Dithering)
 

@@ -55,6 +55,24 @@ int dm4x4[4][4] = {
 	{ 10,   6,   9,   5  }
 }; 
 
+int clustered_dot4x4[4][4] = {
+	{ 12,  5,  6,  13  },
+	{  4,  0,  1,   7  },
+	{ 11,  3,  2,   8  },
+	{ 15, 10,  9,  14  }
+};
+
+int clustered_dot8x8[8][8] = {
+	{24, 10, 12, 26, 35, 47, 49, 37},
+	{ 8,  0,  2, 14, 45, 59, 61, 51},
+	{22,  6,  4, 16, 43, 57, 63, 53},
+	{30, 20, 18, 28, 33, 41, 55, 39},
+	{34, 46, 48, 36, 25, 11, 13, 27},
+	{44, 58, 60, 50,  9,  1,  3, 15},
+	{42, 56, 62, 52, 23,  7,  5, 17},
+	{32, 40, 54, 38, 31, 21, 19, 29}
+};
+
 int magic_square3x3[3][3] = {
 	{ 8, 1, 6 },
 	{ 3, 5, 7 },
@@ -493,6 +511,7 @@ const int BAYER_PATTERN_64X64[64][64] = {
 
 typedef enum {
 	BAYER,
+	DOT, 
 	FORCE,
 	MAGIC,
 	SHIDOKU,
@@ -508,14 +527,12 @@ void print_usage(char *argv[]) {
 
 int main(int argc, char *argv[]) 
 {
-	// ´NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-
 	@autoreleasepool {
 
 		// Prefix with : to suppress the default error messages from getopt_long, which we will handle ourselves
 		const char *short_opts = ":hd:s:";
 
-		// Dithering options/algorithms/patterns (-d | --dither): bayer, void, force, magic
+		// Dithering options/algorithms/patterns (-d | --dither): bayer, dot, void, force, magic, shidoku
 		// Matrix size (-s | --size): 2, 3, 4, 8, 16
 		static struct option long_opts[] = {
 			{"help", no_argument, NULL, 'h'},
@@ -570,6 +587,8 @@ int main(int argc, char *argv[])
 	if (ditherArg != nil) {
 		if ([ditherArg isEqualToString: @"bayer"] == YES) {
 			ditherType = BAYER;
+		} else if ([ditherArg isEqualToString: @"dot"] == YES) {
+			ditherType = DOT;
 		} else if ([ditherArg isEqualToString: @"force"] == YES) {
 			ditherType = FORCE;
 		} else if ([ditherArg isEqualToString: @"magic"] == YES) {
@@ -687,6 +706,14 @@ CGFloat ditherValue(DitherType ditherType, int ditherLevel, int col, int row) {
 	// printf("Dither type: %d | Dither level: %d ", ditherType, ditherLevel);
 	
 	switch (ditherType) {
+		case DOT:
+			if (ditherLevel == 4) {
+				return clustered_dot4x4[col][row] / 15.0;
+			} else {
+				return clustered_dot8x8[col][row] / 63.0;
+			}
+			break;
+
 		case FORCE:
 			if (ditherLevel == 8) {
 				return forced_field8x8[col][row] / 63.0; 
@@ -694,6 +721,7 @@ CGFloat ditherValue(DitherType ditherType, int ditherLevel, int col, int row) {
 				return forced_field16x16[col][row] / 255.0;
 			}
 			break;
+
 		case MAGIC:
 			if (ditherLevel == 3) {
 				return magic_square3x3[col][row] / 9.0;
@@ -703,9 +731,11 @@ CGFloat ditherValue(DitherType ditherType, int ditherLevel, int col, int row) {
 				return magic_square5x5[col][row] / 25.0;
 			}
 			break;
+
 		case SHIDOKU:
 			return shidoku_matrix4x4[col][row] / 4.0;
 			break;
+
 		case VOID:
 			if (ditherLevel == 4) {
 				return void_cluster4x4[col][row] / 15.0;
@@ -717,8 +747,9 @@ CGFloat ditherValue(DitherType ditherType, int ditherLevel, int col, int row) {
 				return void_cluster32x32[col][row] / 1023.0;
 			} else { // 64x64
 				return void_cluster64x64[col][row] / 4095.0; 
-				}
+			}
 			break;
+
 		case BAYER:
 		default: // For Bayer and the default case
 			if (ditherLevel == 2) {
@@ -738,7 +769,7 @@ CGFloat ditherValue(DitherType ditherType, int ditherLevel, int col, int row) {
 			} else { // default is 16x16
 				return BAYER_PATTERN_16X16[col][row] / 255.0;
 			}
-		break;
+			break;
 	}
 
 }
