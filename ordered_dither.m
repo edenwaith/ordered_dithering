@@ -55,11 +55,24 @@ int dm4x4[4][4] = {
 	{ 10,   6,   9,   5  }
 }; 
 
+// CLUSTERED DOT =========================
+// Clustered dot matrices from: http://caca.zoy.org/study/part2.html
+
 int clustered_dot4x4[4][4] = {
 	{ 12,  5,  6,  13  },
 	{  4,  0,  1,   7  },
 	{ 11,  3,  2,   8  },
 	{ 15, 10,  9,  14  }
+};
+
+// This matrix comes from page 62 (Figure 7-b) from the book Graphics Gems II (1991)
+int clustered_dot6x6[6][6] = {
+	{ 30, 19, 13, 20, 31, 35 },
+	{ 18,  8,  5,  9, 21, 29 },
+	{ 12,  4,  1,  2, 10, 28 },
+	{ 17,  7,  3,  6, 14, 27 },
+	{ 26, 16, 11, 15, 22, 32 },
+	{ 34, 25, 24, 23, 33, 36 }
 };
 
 int clustered_dot8x8[8][8] = {
@@ -73,6 +86,7 @@ int clustered_dot8x8[8][8] = {
 	{32, 40, 54, 38, 31, 21, 19, 29}
 };
 
+// MAGIC SQUARE =========================
 int magic_square3x3[3][3] = {
 	{ 8, 1, 6 },
 	{ 3, 5, 7 },
@@ -102,6 +116,7 @@ int magic_square5x5[5][5] = {
 	{ 11,	18,	25,	2,	9 }
 };
 
+// SHIDOKU =========================
 int shidoku_matrix4x4[4][4] = {
 	{ 1, 2, 3, 4 },
 	{ 3, 4, 1, 2 },
@@ -120,7 +135,7 @@ int dm8x8[8][8] = {
 	{ 42,  26,  38,  22,  41,  25,  37,  21  }
 }; 
 
-
+// FORCED FIELD =========================
 
 // Force-Field Function 8x8 Matrix
 // Not entirely certain if this is correct, though, the 0 in the top left looks like a Bayesian matrix
@@ -166,6 +181,7 @@ int forced_field16x16[16][16] = {
 	{ 70, 11, 250, 41, 225, 64, 118, 93, 22, 213, 185, 108, 172, 62, 20, 230 }
 };
 
+// VOID-AND-CLUSTER =========================
 int void_cluster4x4[4][4] = {
 	{   4,   8,   6,  10 },
 	{   2,  12,   1,  14 },
@@ -709,6 +725,8 @@ CGFloat ditherValue(DitherType ditherType, int ditherLevel, int col, int row) {
 		case DOT:
 			if (ditherLevel == 4) {
 				return clustered_dot4x4[col][row] / 15.0;
+			} else if (ditherLevel == 6) {
+				return clustered_dot6x6[col][row] / 36.0;
 			} else {
 				return clustered_dot8x8[col][row] / 63.0;
 			}

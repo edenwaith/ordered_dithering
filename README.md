@@ -43,6 +43,9 @@ Reproduces halftoning technique used by newspapers.
 **4x4**  
 ![Geneva Lake with a 4x4 Clustered Dot dither](Geneva_Lake_dot_dithered_4x4.png)
 
+**6x6**
+![Geneva Lake with a 6x6 Clustered Dot dither](Geneva_Lake_dot_dithered_6x6.png)
+
 **8x8**  
 ![Geneva Lake with a 8x8 Clustered Dot dither](Geneva_Lake_dot_dithered_8x8.png)
 
