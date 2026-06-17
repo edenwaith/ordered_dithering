@@ -58,6 +58,12 @@ int dm4x4[4][4] = {
 // CLUSTERED DOT =========================
 // Clustered dot matrices from: http://caca.zoy.org/study/part2.html
 
+int clustered_dot3x3[3][3] = {
+	{ 4, 5, 6 },
+	{ 3, 0, 7 },
+	{ 2, 1, 8 }
+};
+
 int clustered_dot4x4[4][4] = {
 	{ 12,  5,  6,  13  },
 	{  4,  0,  1,   7  },
@@ -723,7 +729,9 @@ CGFloat ditherValue(DitherType ditherType, int ditherLevel, int col, int row) {
 	
 	switch (ditherType) {
 		case DOT:
-			if (ditherLevel == 4) {
+			if (ditherLevel == 3) {
+				return clustered_dot3x3[col][row] / 8.0;
+			} else  if (ditherLevel == 4) {
 				return clustered_dot4x4[col][row] / 15.0;
 			} else if (ditherLevel == 6) {
 				return clustered_dot6x6[col][row] / 36.0;
