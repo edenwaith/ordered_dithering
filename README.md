@@ -1,5 +1,5 @@
 # Ordered Dithering
-Command line utility to create 1-bit images featuring five different forms of ordered dithering: `Bayer`, `Forced Field`, `Magic Square`, `Shidoku`, and `Void-and-Cluster`.
+Command line utility to create 1-bit images featuring six different forms of ordered dithering: `Bayer`, `Clustered Dot`, `Forced Field`, `Magic Square`, `Shidoku`, and `Void-and-Cluster`.
 
 To compile: ` gcc -w -framework Foundation -framework AppKit -framework QuartzCore ordered_dither.m -o ordered_dither`
 
@@ -39,6 +39,9 @@ The granddaddy of ordered dithering matrices, based on the paper [An optimum met
 ## Clustered Dot
 
 Reproduces halftoning technique used by newspapers.
+
+**3x3**  
+![Geneva Lake with a 3x3 Clustered Dot dither](Geneva_Lake_dot_dithered_3x3.png)
 
 **4x4**  
 ![Geneva Lake with a 4x4 Clustered Dot dither](Geneva_Lake_dot_dithered_4x4.png)
