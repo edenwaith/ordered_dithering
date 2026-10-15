@@ -55,8 +55,25 @@ int dm4x4[4][4] = {
 	{ 10,   6,   9,   5  }
 }; 
 
+int dm8x8[8][8] = {
+	{  0,  48,  12,  60,   3,  51,  15,  63, },
+	{ 32,  16,  44,  28,  35,  19,  47,  31, },
+	{  8,  56,   4,  52,  11,  59,   7,  55, },
+	{ 40,  24,  36,  20,  43,  27,  39,  23, },
+	{  2,  50,  14,  62,   1,  49,  13,  61, },
+	{ 34,  18,  46,  30,  33,  17,  45,  29, },
+	{ 10,  58,   6,  54,   9,  57,   5,  53, },
+	{ 42,  26,  38,  22,  41,  25,  37,  21  }
+}; 
+
 // CLUSTERED DOT =========================
 // Clustered dot matrices from: http://caca.zoy.org/study/part2.html
+
+// This is purely experimental, it probably will closely resemble a 2x2 Bayer matrix
+int clustered_dot2x2[2][2] = {
+	{ 0, 1 },
+	{ 3, 2 }
+};
 
 int clustered_dot3x3[3][3] = {
 	{ 4, 5, 6 },
@@ -72,6 +89,7 @@ int clustered_dot4x4[4][4] = {
 };
 
 // This matrix comes from page 62 (Figure 7-b) from the book Graphics Gems II (1991)
+// Note that is starts at 1, and not 0
 int clustered_dot6x6[6][6] = {
 	{ 30, 19, 13, 20, 31, 35 },
 	{ 18,  8,  5,  9, 21, 29 },
@@ -79,6 +97,16 @@ int clustered_dot6x6[6][6] = {
 	{ 17,  7,  3,  6, 14, 27 },
 	{ 26, 16, 11, 15, 22, 32 },
 	{ 34, 25, 24, 23, 33, 36 }
+};
+
+// An experimental 6x6 clustered dot matrix of unknown origins.
+int clustered_dot6x6_alt[6][6] = {
+	{  9,  10,  11,  14,  13,  12 }, 
+	{ 10,   3,   4,  15,  22,  21 }, 
+	{ 11,   4,   0,  16,  23,  22 }, 
+	{ 14,  15,  16,  17,  20,  21 }, 
+	{ 13,  22,  23,  20,  19,  18 }, 
+	{ 12,  21,  22,  21,  18,  17 } 
 };
 
 int clustered_dot8x8[8][8] = {
@@ -129,17 +157,6 @@ int shidoku_matrix4x4[4][4] = {
 	{ 2, 1, 4, 3 },
 	{ 4, 3, 2, 1 }
 };
-
-int dm8x8[8][8] = {
-	{  0,  48,  12,  60,   3,  51,  15,  63, },
-	{ 32,  16,  44,  28,  35,  19,  47,  31, },
-	{  8,  56,   4,  52,  11,  59,   7,  55, },
-	{ 40,  24,  36,  20,  43,  27,  39,  23, },
-	{  2,  50,  14,  62,   1,  49,  13,  61, },
-	{ 34,  18,  46,  30,  33,  17,  45,  29, },
-	{ 10,  58,   6,  54,   9,  57,   5,  53, },
-	{ 42,  26,  38,  22,  41,  25,  37,  21  }
-}; 
 
 // FORCED FIELD =========================
 
@@ -206,14 +223,14 @@ int void_cluster4x4[4][4] = {
 
 // This one seems to cause odd, repeating swirls
 int void_cluster8x8_original[8][8] = {
-	{ 34,12,55,2,41,18,61,9 },
-	{ 3,48,24,36,10,50,28,43 },
-	{ 59,15,39,7,63,22,37,5 }, 
-	{ 26,51,1,45,31,54,13,57 }, 
-	{ 8,33,58,20,47,4,40,19 }, 
-	{ 42,17,11,38,60,25,53,32 }, 
-	{ 62,52,44,29,14,56,6,49 }, 
-	{ 21,0,35,56,46,16,30,23 }
+	{ 34, 12, 55,  2, 41, 18, 61,  9 },
+	{ 3,  48, 24, 36, 10, 50, 28, 43 },
+	{ 59, 15, 39,  7, 63, 22, 37,  5 }, 
+	{ 26, 51,  1, 45, 31, 54, 13, 57 }, 
+	{ 8,  33, 58, 20, 47,  4, 40, 19 }, 
+	{ 42, 17, 11, 38, 60, 25, 53, 32 }, 
+	{ 62, 52, 44, 29, 14, 56,  6, 49 }, 
+	{ 21,  0, 35, 56, 46, 16, 30, 23 }
 };
 
 int void_cluster8x8[8][8] = {
@@ -547,6 +564,20 @@ void print_usage(char *argv[]) {
 	printf("usage: %s [--size size_of_matrix] [--dither dither_type] path/to/image\n", argv[0]);
 }
 
+/**
+ Convert a gamma-encoded sRGB component (0.0 - 1.0) to linear space.
+ This uses the standard approximation curve of gamma 2.2.
+ */
+static inline CGFloat convertSRGBToLinear(CGFloat component) {
+    if (component <= 0.04045) {
+        return component / 12.92;
+    } else {
+        return pow((component + 0.055) / 1.055, 2.4);
+        // An approximation of pow(component, 2.2) can also be used for performance:
+        // return pow(component, 2.2);
+    }
+}
+
 int main(int argc, char *argv[]) 
 {
 	@autoreleasepool {
@@ -673,21 +704,30 @@ int main(int argc, char *argv[])
 			CGFloat blue  = [originalPixelColor blueComponent];
 			CGFloat alpha = [originalPixelColor alphaComponent];
 
-			// Divide by 255.0 to normalize the value
-			CGFloat bayerDitherValue =  ditherValue(ditherType, ditherLevel, col, row);
+			// 2. De-gamma (Linearize the components)
+			CGFloat rLinear = convertSRGBToLinear(red);
+			CGFloat gLinear = convertSRGBToLinear(green);
+			CGFloat bLinear = convertSRGBToLinear(blue);
+
+			CGFloat thresholdValue =  ditherValue(ditherType, ditherLevel, col, row);
 
 			// https://brandonrohrer.com/convert_rgb_to_grayscale.html
 			// The Standard Weighted Formula
+			// This also matches the formula used for the RGB to YIQ conversion for just luminensence (Y).  
+			// This is the same as Rec. 601, developed in 1953 as the NTSC standard.
+			// The newer standard for HD and sRGB is Rec. 709, which recommends:
+			// Y = 0.2126R + 0.7152G + 0.0722B
 
 			// To convert a color image to grayscale or to calculate "perceived" error, we use a weighted average:
 
 			// Y=0.299R+0.587G+0.114B
 			// Green (58.7%): Carries the most detail and "brightness" information.
-
 			// Red (29.9%): Carries mid-level brightness.
-
 			// Blue (11.4%): Contributes very little to perceived lightness; we use it mostly for color "tint."
-			CGFloat lumaGrayValue = (0.299 * red) + (0.587 * green) + (0.114 * blue);
+
+			// CGFloat lumaGrayValue = (0.299 * red) + (0.587 * green) + (0.114 * blue);
+			CGFloat lumaGrayValue = (0.299 * rLinear) + (0.587 * gLinear) + (0.114 * bLinear); // Rec. 601
+			// CGFloat lumaGrayValue = (0.2126 * rLinear) + (0.7152 * gLinear) + (0.0722 * bLinear); // Rec. 709
 
 			// CGFloat avgPixelColor = (red + green + blue)/3.0; // TODO: Can use other methods to attribute to gamma correction // (0.299, 0.587, 0.114));
 			CGFloat newColor = 0.0;
@@ -697,7 +737,7 @@ int main(int argc, char *argv[])
 			if (lumaGrayValue == 0.0 || lumaGrayValue == 1.0) {
 				newColor = lumaGrayValue;
 			} else {
-				newColor = lumaGrayValue < bayerDitherValue ? 0 : 1.0;
+				newColor = lumaGrayValue < thresholdValue ? 0 : 1.0;
 			}
 
 			NSColor *newPixelColor = [NSColor colorWithCalibratedRed: newColor green: newColor blue: newColor alpha: 1.0];
